@@ -1,5 +1,6 @@
 *.md
 !README.md
+!docs/**/*.md
 
 __pycache__/
 *.py[cod]
@@ -24,3 +25,5 @@ Thumbs.db
 
 .vscode/
 .idea/
+
+.docs/
