@@ -1,0 +1,1 @@
+controllers receive request -> services checks and executes -> repositories reads and writes in postgressql -> models explains the data

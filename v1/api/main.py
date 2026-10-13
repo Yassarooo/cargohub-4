@@ -823,7 +823,7 @@ class ApiRequestHandler(http.server.BaseHTTPRequestHandler):
                 self.end_headers()
 
 if __name__ == "__main__":
-    PORT = 3000
+    PORT = 8000
     with socketserver.TCPServer(("", PORT), ApiRequestHandler) as httpd:
         notification_processor.start()
         print(f"Serving on port {PORT}...")
