@@ -22,6 +22,7 @@ class Clients(Base):
         client["created_at"] = self.get_timestamp()
         client["updated_at"] = self.get_timestamp()
         self.data.append(client)
+        self.save()
 
     def update_client(self, client_id, client):
         client["updated_at"] = self.get_timestamp()
@@ -29,11 +30,13 @@ class Clients(Base):
             if self.data[i]["id"] == client_id:
                 self.data[i] = client
                 break
+        self.save()
 
     def remove_client(self, client_id):
         for x in self.data:
             if x["id"] == client_id:
                 self.data.remove(x)
+                self.save()
 
     def load(self, is_debug):
         if is_debug:
