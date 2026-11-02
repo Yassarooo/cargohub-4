@@ -1,8 +1,10 @@
 # test of the get all endpoints 200 ok returnen met een niet lege json body
 # de api is langzaam en raakt snel overbelast
 
-# python -m pytest  ---> runned alle pytests (moet in de cargohub-4 dir zitten)
-# duurt heel lang trouwens om te runnen
+# python -m pytest
+# ---> runned alle pytests (moet in de cargohub-4 dir zitten)
+# duurt lang omdat de timeout naar 30 sec is gezet, op 10 sec haalt die geen 12 tests
+
 
 import json
 from urllib.error import HTTPError
