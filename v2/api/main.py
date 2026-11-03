@@ -36,6 +36,21 @@ class ApiRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_response(404)
             self.end_headers()
 
+    def handle_get_item_lines(self, paths):
+        """Handel GET /item_lines, /item_lines/{id} en /item_lines/{id}/items af."""
+        parts = len(paths)
+        if parts == 1:
+            self.send_json(data_provider.fetch_item_line_pool().get_item_lines())
+        elif parts == 2:
+            item_line_id = int(paths[1])
+            self.send_json(data_provider.fetch_item_line_pool().get_item_line(item_line_id))
+        elif parts == 3 and paths[2] == "items":
+            item_line_id = int(paths[1])
+            self.send_json(data_provider.fetch_item_pool().get_items_for_item_line(item_line_id))
+        else:
+            self.send_response(404)
+            self.end_headers()
+
     def handle_get_version_1(self, paths, user):
         if not auth_provider.has_access(user, paths, "get"):
             self.send_response(403)
@@ -123,35 +138,7 @@ class ApiRequestHandler(http.server.BaseHTTPRequestHandler):
         elif paths[0] == "items":
             self.handle_get_items(paths)
         elif paths[0] == "item_lines":
-            parts = len(paths)
-            match parts:
-                case 1:
-                    item_lines = data_provider.fetch_item_line_pool().get_item_lines()
-                    self.send_response(200)
-                    self.send_header("Content-type", "application/json")
-                    self.end_headers()
-                    self.wfile.write(json.dumps(item_lines).encode("utf-8"))
-                case 2:
-                    item_line_id = int(paths[1])
-                    item_line = data_provider.fetch_item_line_pool().get_item_line(item_line_id)
-                    self.send_response(200)
-                    self.send_header("Content-type", "application/json")
-                    self.end_headers()
-                    self.wfile.write(json.dumps(item_line).encode("utf-8"))
-                case 3:
-                    if paths[2] == "items":
-                        item_line_id = int(paths[1])
-                        items = data_provider.fetch_item_pool().get_items_for_item_line(item_line_id)
-                        self.send_response(200)
-                        self.send_header("Content-type", "application/json")
-                        self.end_headers()
-                        self.wfile.write(json.dumps(items).encode("utf-8"))
-                    else:
-                        self.send_response(404)
-                        self.end_headers()
-                case _:
-                    self.send_response(404)
-                    self.end_headers()
+            self.handle_get_item_lines(paths)
         elif paths[0] == "item_groups":
             parts = len(paths)
             match parts:
