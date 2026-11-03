@@ -25,6 +25,28 @@ def locations(tmp_path):
 
     return Locations(str(tmp_path) + os.sep)
 
+
+@pytest.fixture
+def empty_locations(tmp_path):
+    """Maak een Locations-model zonder locaties."""
+    data_file = tmp_path / "location.json"
+    data_file.write_text("[]", encoding="utf-8")
+
+    return Locations(str(tmp_path) + os.sep)
+
+
+def test_get_locations_good(locations):
+    result = locations.get_locations()
+
+    assert result == TEST_LOCATIONS
+
+
+def test_get_locations_empty(empty_locations):
+    result = empty_locations.get_locations()
+
+    assert result == []
+
+
 def test_get_location_good(locations):
     result = locations.get_location(2)
 
