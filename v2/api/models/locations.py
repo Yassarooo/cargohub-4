@@ -14,16 +14,16 @@ class Locations(Base):
 
     def get_location(self, location_id):
         for x in self.data:
-            if x["id"] == location_id:
-                return x
+        for location in self.data:
+            if location["id"] == location_id:
+                return location
         return None
 
     def get_locations_in_warehouse(self, warehouse_id):
-        result = []
-        for x in self.data:
-            if x["warehouse_id"] == warehouse_id:
-                result.append(x)
-        return result
+        return [
+            location for location in self.data
+            if location["warehouse_id"] == warehouse_id
+        ]
 
     def add_location(self, location):
         location["created_at"] = self.get_timestamp()
