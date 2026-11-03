@@ -34,3 +34,8 @@ def test_get_location_bad_unknown_id(locations):
     result = locations.get_location(999)
 
     assert result is None
+
+def test_get_locations_in_warehouse_good(locations):
+    result = locations.get_locations_in_warehouse(10)
+
+    assert result == [TEST_LOCATIONS[0], TEST_LOCATIONS[2]]
