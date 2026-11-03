@@ -13,7 +13,6 @@ class Locations(Base):
         return self.data
 
     def get_location(self, location_id):
-        for x in self.data:
         for location in self.data:
             if location["id"] == location_id:
                 return location
