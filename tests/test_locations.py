@@ -69,3 +69,15 @@ def test_get_locations_in_warehouse_good(locations):
     result = locations.get_locations_in_warehouse(10)
 
     assert result == [TEST_LOCATIONS[0], TEST_LOCATIONS[2]]
+
+
+def test_get_locations_in_warehouse_one_location(locations):
+    result = locations.get_locations_in_warehouse(20)
+
+    assert result == [TEST_LOCATIONS[1]]
+
+
+def test_get_locations_in_warehouse_bad_unknown_id(locations):
+    result = locations.get_locations_in_warehouse(999)
+
+    assert result == []
