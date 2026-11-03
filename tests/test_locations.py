@@ -29,3 +29,8 @@ def test_get_location_good(locations):
     result = locations.get_location(2)
 
     assert result == TEST_LOCATIONS[1]
+
+def test_get_location_bad_unknown_id(locations):
+    result = locations.get_location(999)
+
+    assert result is None
