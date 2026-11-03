@@ -1,0 +1,83 @@
+import json
+import os
+import sys
+
+import pytest
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "v2", "api"),
+)
+from models.locations import Locations
+
+TEST_LOCATIONS = [
+    {"id": 1, "warehouse_id": 10, "code": "A-01"},
+    {"id": 2, "warehouse_id": 20, "code": "B-01"},
+    {"id": 3, "warehouse_id": 10, "code": "A-02"},
+]
+
+
+@pytest.fixture
+def locations(tmp_path):
+    data_file = tmp_path / "location.json"
+    data_file.write_text(
+        json.dumps(TEST_LOCATIONS),
+        encoding="utf-8",
+    )
+
+    return Locations(str(tmp_path) + os.sep)
+
+
+@pytest.fixture
+def empty_locations(tmp_path):
+    """Maak een Locations-model zonder locaties."""
+    data_file = tmp_path / "location.json"
+    data_file.write_text("[]", encoding="utf-8")
+
+    return Locations(str(tmp_path) + os.sep)
+
+
+def test_get_locations_good(locations):
+    result = locations.get_locations()
+
+    assert result == TEST_LOCATIONS
+
+
+def test_get_locations_empty(empty_locations):
+    result = empty_locations.get_locations()
+
+    assert result == []
+
+
+def test_get_location_good(locations):
+    result = locations.get_location(2)
+
+    assert result == TEST_LOCATIONS[1]
+
+
+def test_get_location_bad_unknown_id(locations):
+    result = locations.get_location(999)
+
+    assert result is None
+
+
+def test_get_location_empty(empty_locations):
+    result = empty_locations.get_location(1)
+
+    assert result is None
+
+
+def test_get_locations_in_warehouse_good(locations):
+    result = locations.get_locations_in_warehouse(10)
+
+    assert result == [TEST_LOCATIONS[0], TEST_LOCATIONS[2]]
+
+
+def test_get_locations_in_warehouse_one_location(locations):
+    result = locations.get_locations_in_warehouse(20)
+
+    assert result == [TEST_LOCATIONS[1]]
+
+
+def test_get_locations_in_warehouse_bad_unknown_id(locations):
+    result = locations.get_locations_in_warehouse(999)
+
+    assert result == []

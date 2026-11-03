@@ -61,10 +61,7 @@ class ApiRequestHandler(http.server.BaseHTTPRequestHandler):
                     if paths[2] == "locations":
                         warehouse_id = int(paths[1])
                         locations = data_provider.fetch_location_pool().get_locations_in_warehouse(warehouse_id)
-                        self.send_response(200)
-                        self.send_header("Content-type", "application/json")
-                        self.end_headers()
-                        self.wfile.write(json.dumps(locations).encode("utf-8"))
+                        self.send_json(locations)
                     else:
                         self.send_response(404)
                         self.end_headers()
@@ -76,17 +73,11 @@ class ApiRequestHandler(http.server.BaseHTTPRequestHandler):
             match parts:
                 case 1:
                     locations = data_provider.fetch_location_pool().get_locations()
-                    self.send_response(200)
-                    self.send_header("Content-type", "application/json")
-                    self.end_headers()
-                    self.wfile.write(json.dumps(locations).encode("utf-8"))
+                    self.send_json(locations)
                 case 2:
                     location_id = int(paths[1])
                     location = data_provider.fetch_location_pool().get_location(location_id)
-                    self.send_response(200)
-                    self.send_header("Content-type", "application/json")
-                    self.end_headers()
-                    self.wfile.write(json.dumps(location).encode("utf-8"))
+                    self.send_json(location)
                 case _:
                     self.send_response(404)
                     self.end_headers()
