@@ -52,10 +52,18 @@ def test_get_location_good(locations):
 
     assert result == TEST_LOCATIONS[1]
 
+
 def test_get_location_bad_unknown_id(locations):
     result = locations.get_location(999)
 
     assert result is None
+
+
+def test_get_location_empty(empty_locations):
+    result = empty_locations.get_location(1)
+
+    assert result is None
+
 
 def test_get_locations_in_warehouse_good(locations):
     result = locations.get_locations_in_warehouse(10)
