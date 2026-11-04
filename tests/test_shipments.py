@@ -82,3 +82,20 @@ def test_get_items_in_shipment_good(shipments):
 def test_get_items_in_shipment_bad_unknown_id(shipments):
     """Slecht: shipment 99 bestaat niet, dus een lege lijst."""
     assert shipments.get_items_in_shipment(99) == []
+
+
+# get_order_ids_in_shipment
+
+def test_get_order_ids_in_shipment_good(shipments):
+    """Goed: shipment 2 hoort bij order 2."""
+    assert shipments.get_order_ids_in_shipment(2) == [2]
+
+
+def test_get_order_ids_in_shipment_no_order(shipments):
+    """Shipment 3 heeft geen order, dus een lege lijst."""
+    assert shipments.get_order_ids_in_shipment(3) == []
+
+
+def test_get_order_ids_in_shipment_bad_unknown_id(shipments):
+    """Slecht: shipment 99 bestaat niet, dus een lege lijst."""
+    assert shipments.get_order_ids_in_shipment(99) == []
