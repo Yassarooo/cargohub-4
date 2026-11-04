@@ -36,6 +36,24 @@ class ApiRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_response(404)
             self.end_headers()
 
+    def handle_get_shipments(self, paths):
+        """Handel GET /shipments, /shipments/{id}, /shipments/{id}/orders en /shipments/{id}/items af."""
+        parts = len(paths)
+        if parts == 1:
+            self.send_json(data_provider.fetch_shipment_pool().get_shipments())
+        elif parts == 2:
+            shipment_id = int(paths[1])
+            self.send_json(data_provider.fetch_shipment_pool().get_shipment(shipment_id))
+        elif parts == 3 and paths[2] == "orders":
+            shipment_id = int(paths[1])
+            self.send_json(data_provider.fetch_shipment_pool().get_order_ids_in_shipment(shipment_id))
+        elif parts == 3 and paths[2] == "items":
+            shipment_id = int(paths[1])
+            self.send_json(data_provider.fetch_shipment_pool().get_items_in_shipment(shipment_id))
+        else:
+            self.send_response(404)
+            self.end_headers()
+
     def handle_get_version_1(self, paths, user):
         if not auth_provider.has_access(user, paths, "get"):
             self.send_response(403)
@@ -311,42 +329,7 @@ class ApiRequestHandler(http.server.BaseHTTPRequestHandler):
                     self.send_response(404)
                     self.end_headers() 
         elif paths[0] == "shipments":
-            parts = len(paths)
-            match parts:
-                case 1:
-                    shipments = data_provider.fetch_shipment_pool().get_shipments()
-                    self.send_response(200)
-                    self.send_header("Content-type", "application/json")
-                    self.end_headers()
-                    self.wfile.write(json.dumps(shipments).encode("utf-8"))
-                case 2:
-                    shipment_id = int(paths[1])
-                    shipment = data_provider.fetch_shipment_pool().get_shipment(shipment_id)
-                    self.send_response(200)
-                    self.send_header("Content-type", "application/json")
-                    self.end_headers()
-                    self.wfile.write(json.dumps(shipment).encode("utf-8"))
-                case 3:
-                    if paths[2] == "orders":
-                        shipment_id = int(paths[1])
-                        orders = data_provider.fetch_shipment_pool().get_order_ids_in_shipment(shipment_id)
-                        self.send_response(200)
-                        self.send_header("Content-type", "application/json")
-                        self.end_headers()
-                        self.wfile.write(json.dumps(orders).encode("utf-8"))
-                    elif paths[2] == "items":
-                        shipment_id = int(paths[1])
-                        items = data_provider.fetch_shipment_pool().get_items_in_shipment(shipment_id)
-                        self.send_response(200)
-                        self.send_header("Content-type", "application/json")
-                        self.end_headers()
-                        self.wfile.write(json.dumps(items).encode("utf-8"))
-                    else:
-                        self.send_response(404)
-                        self.end_headers()
-                case _:
-                    self.send_response(404)
-                    self.end_headers()
+            self.handle_get_shipments(paths)
         else:
             self.send_response(404)
             self.end_headers()
