@@ -128,3 +128,35 @@ def test_add_shipment_bad_not_saved_without_save(shipments, tmp_path):
 
     reloaded = Shipments(str(tmp_path) + os.sep)
     assert reloaded.get_shipment(4) is None
+
+
+# update_shipment (PUT)
+
+def test_update_shipment_good(shipments):
+    """Goed: na wijzigen geeft get de nieuwe status terug."""
+    shipments.update_shipment(
+        1, {"id": 1, "reference": "SHP-000001", "order_id": 1, "shipment_status": "Delivered"}
+    )
+
+    result = shipments.get_shipment(1)
+    assert result["shipment_status"] == "Delivered"
+    assert result["updated_at"] != ""
+
+
+def test_update_shipment_saved(shipments, tmp_path):
+    """Goed: na save staat de wijziging ook in het bestand."""
+    shipments.update_shipment(
+        2, {"id": 2, "reference": "SHP-000002", "order_id": 2, "shipment_status": "Delivered"}
+    )
+    shipments.save()
+
+    reloaded = Shipments(str(tmp_path) + os.sep)
+    assert reloaded.get_shipment(2)["shipment_status"] == "Delivered"
+
+
+def test_update_shipment_bad_unknown_id(shipments):
+    """Slecht: shipment 99 bestaat niet, er verandert niks."""
+    shipments.update_shipment(99, {"id": 99, "reference": "SHP-000099"})
+
+    assert shipments.get_shipment(99) is None
+    assert len(shipments.get_shipments()) == 3
