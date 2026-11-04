@@ -46,3 +46,32 @@ def test_get_supplier_good(suppliers):
 def test_get_supplier_bad_unknown_id(suppliers):
     """Slecht: supplier 99 bestaat niet, dus None."""
     assert suppliers.get_supplier(99) is None
+
+
+# add_supplier (POST)
+
+def test_add_supplier_good(suppliers):
+    """Goed: na toevoegen kan je supplier 4 opvragen."""
+    suppliers.add_supplier({"id": 4, "code": "SUP-0004", "name": "Philips", "city": "Eindhoven"})
+
+    result = suppliers.get_supplier(4)
+    assert result["name"] == "Philips"
+    assert result["created_at"] != ""
+    assert len(suppliers.get_suppliers()) == 4
+
+
+def test_add_supplier_saved(suppliers, tmp_path):
+    """Goed: na save staat de nieuwe supplier ook in het bestand."""
+    suppliers.add_supplier({"id": 4, "code": "SUP-0004", "name": "Philips", "city": "Eindhoven"})
+    suppliers.save()
+
+    reloaded = Suppliers(str(tmp_path) + os.sep)
+    assert reloaded.get_supplier(4)["name"] == "Philips"
+
+
+def test_add_supplier_bad_not_saved_without_save(suppliers, tmp_path):
+    """Slecht: zonder save komt de supplier niet in het bestand."""
+    suppliers.add_supplier({"id": 4, "code": "SUP-0004", "name": "Philips", "city": "Eindhoven"})
+
+    reloaded = Suppliers(str(tmp_path) + os.sep)
+    assert reloaded.get_supplier(4) is None
