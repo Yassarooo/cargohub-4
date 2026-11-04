@@ -99,3 +99,114 @@ def test_get_order_ids_in_shipment_no_order(shipments):
 def test_get_order_ids_in_shipment_bad_unknown_id(shipments):
     """Slecht: shipment 99 bestaat niet, dus een lege lijst."""
     assert shipments.get_order_ids_in_shipment(99) == []
+
+
+# add_shipment (POST)
+
+def test_add_shipment_good(shipments):
+    """Goed: na toevoegen kan je shipment 4 opvragen."""
+    shipments.add_shipment({"id": 4, "reference": "SHP-000004", "order_id": 3})
+
+    result = shipments.get_shipment(4)
+    assert result["reference"] == "SHP-000004"
+    assert result["created_at"] != ""
+    assert len(shipments.get_shipments()) == 4
+
+
+def test_add_shipment_saved(shipments, tmp_path):
+    """Goed: na save staat de nieuwe shipment ook in het bestand."""
+    shipments.add_shipment({"id": 4, "reference": "SHP-000004", "order_id": 3})
+    shipments.save()
+
+    reloaded = Shipments(str(tmp_path) + os.sep)
+    assert reloaded.get_shipment(4)["reference"] == "SHP-000004"
+
+
+def test_add_shipment_bad_not_saved_without_save(shipments, tmp_path):
+    """Slecht: zonder save komt de shipment niet in het bestand."""
+    shipments.add_shipment({"id": 4, "reference": "SHP-000004", "order_id": 3})
+
+    reloaded = Shipments(str(tmp_path) + os.sep)
+    assert reloaded.get_shipment(4) is None
+
+
+# update_shipment (PUT)
+
+def test_update_shipment_good(shipments):
+    """Goed: na wijzigen geeft get de nieuwe status terug."""
+    shipments.update_shipment(
+        1, {"id": 1, "reference": "SHP-000001", "order_id": 1, "shipment_status": "Delivered"}
+    )
+
+    result = shipments.get_shipment(1)
+    assert result["shipment_status"] == "Delivered"
+    assert result["updated_at"] != ""
+
+
+def test_update_shipment_saved(shipments, tmp_path):
+    """Goed: na save staat de wijziging ook in het bestand."""
+    shipments.update_shipment(
+        2, {"id": 2, "reference": "SHP-000002", "order_id": 2, "shipment_status": "Delivered"}
+    )
+    shipments.save()
+
+    reloaded = Shipments(str(tmp_path) + os.sep)
+    assert reloaded.get_shipment(2)["shipment_status"] == "Delivered"
+
+
+def test_update_shipment_bad_unknown_id(shipments):
+    """Slecht: shipment 99 bestaat niet, er verandert niks."""
+    shipments.update_shipment(99, {"id": 99, "reference": "SHP-000099"})
+
+    assert shipments.get_shipment(99) is None
+    assert len(shipments.get_shipments()) == 3
+
+
+# update_orders_in_shipment (PUT /shipments/{id}/orders)
+
+def test_update_orders_in_shipment_good(shipments):
+    """Goed: shipment 3 krijgt order 5."""
+    shipments.update_orders_in_shipment(3, [5])
+
+    assert shipments.get_order_ids_in_shipment(3) == [5]
+
+
+def test_update_orders_in_shipment_empty_list(shipments):
+    """Een lege lijst haalt de order weg bij shipment 1."""
+    shipments.update_orders_in_shipment(1, [])
+
+    assert shipments.get_order_ids_in_shipment(1) == []
+
+
+def test_update_orders_in_shipment_bad_unknown_id(shipments):
+    """Slecht: shipment 99 bestaat niet, er verandert niks."""
+    shipments.update_orders_in_shipment(99, [5])
+
+    assert shipments.get_order_ids_in_shipment(99) == []
+    assert shipments.get_order_ids_in_shipment(1) == [1]
+
+
+# remove_shipment (DELETE)
+
+def test_remove_shipment_good(shipments):
+    """Goed: na verwijderen is shipment 2 weg."""
+    shipments.remove_shipment(2)
+
+    assert shipments.get_shipment(2) is None
+    assert len(shipments.get_shipments()) == 2
+
+
+def test_remove_shipment_saved(shipments, tmp_path):
+    """Goed: na save is shipment 2 ook uit het bestand weg."""
+    shipments.remove_shipment(2)
+    shipments.save()
+
+    reloaded = Shipments(str(tmp_path) + os.sep)
+    assert reloaded.get_shipment(2) is None
+
+
+def test_remove_shipment_bad_unknown_id(shipments):
+    """Slecht: shipment 99 bestaat niet, de andere 3 blijven staan."""
+    shipments.remove_shipment(99)
+
+    assert len(shipments.get_shipments()) == 3
