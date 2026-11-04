@@ -36,6 +36,21 @@ class ApiRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_response(404)
             self.end_headers()
 
+    def handle_get_suppliers(self, paths):
+        """Handel GET /suppliers, /suppliers/{id} en /suppliers/{id}/items af."""
+        parts = len(paths)
+        if parts == 1:
+            self.send_json(data_provider.fetch_supplier_pool().get_suppliers())
+        elif parts == 2:
+            supplier_id = int(paths[1])
+            self.send_json(data_provider.fetch_supplier_pool().get_supplier(supplier_id))
+        elif parts == 3 and paths[2] == "items":
+            supplier_id = int(paths[1])
+            self.send_json(data_provider.fetch_item_pool().get_items_for_supplier(supplier_id))
+        else:
+            self.send_response(404)
+            self.end_headers()
+
     def handle_get_shipments(self, paths):
         """Handel GET /shipments, /shipments/{id}, /shipments/{id}/orders en /shipments/{id}/items af."""
         parts = len(paths)
