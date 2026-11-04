@@ -11,27 +11,41 @@ class Shipments(Base):
         self.load(is_debug)
 
     def get_shipments(self):
+        """Geef alle shipments, elk met zijn items."""
+        # shipment_item.json maar 1 keer lezen, niet 1 keer per shipment
+        items_per_shipment = {}
+        for row in data_provider.fetch_shipment_item_pool().data:
+            shipment_id = row["shipment_id"]
+            if shipment_id not in items_per_shipment:
+                items_per_shipment[shipment_id] = []
+            items_per_shipment[shipment_id].append(
+                {"item_id": row["item_id"], "amount": row["amount"]}
+            )
+
         result = []
-        for x in self.data:
-            result.append(self._with_items(x))
+        for shipment in self.data:
+            shipment = dict(shipment)
+            shipment["items"] = items_per_shipment.get(shipment["id"], [])
+            result.append(shipment)
         return result
 
     def get_shipment(self, shipment_id):
-        for x in self.data:
-            if x["id"] == shipment_id:
-                return self._with_items(x)
+        """Geef de shipment met dit id, of None als die niet bestaat."""
+        for shipment in self.data:
+            if shipment["id"] == shipment_id:
+                return self._with_items(shipment)
         return None
 
     def get_items_in_shipment(self, shipment_id):
+        """Geef de items (item_id en amount) van een shipment."""
         rows = data_provider.fetch_shipment_item_pool().get_items_for_shipment(shipment_id)
-        return [{"item_id": r["item_id"], "amount": r["amount"]} for r in rows]
+        return [{"item_id": row["item_id"], "amount": row["amount"]} for row in rows]
 
     def get_order_ids_in_shipment(self, shipment_id):
-        """In the new schema shipment.order_id -> order.id (1:1), so a shipment
-        carries exactly one order id (or none)."""
-        for x in self.data:
-            if x["id"] == shipment_id:
-                order_id = x.get("order_id")
+        """Geef het order id van een shipment in een lijst, of een lege lijst."""
+        for shipment in self.data:
+            if shipment["id"] == shipment_id:
+                order_id = shipment.get("order_id")
                 return [order_id] if order_id is not None else []
         return []
 
