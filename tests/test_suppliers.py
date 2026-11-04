@@ -103,3 +103,29 @@ def test_update_supplier_bad_unknown_id(suppliers):
 
     assert suppliers.get_supplier(99) is None
     assert len(suppliers.get_suppliers()) == 3
+
+
+# remove_supplier (DELETE)
+
+def test_remove_supplier_good(suppliers):
+    """Goed: na verwijderen is supplier 2 weg."""
+    suppliers.remove_supplier(2)
+
+    assert suppliers.get_supplier(2) is None
+    assert len(suppliers.get_suppliers()) == 2
+
+
+def test_remove_supplier_saved(suppliers, tmp_path):
+    """Goed: na save is supplier 2 ook uit het bestand weg."""
+    suppliers.remove_supplier(2)
+    suppliers.save()
+
+    reloaded = Suppliers(str(tmp_path) + os.sep)
+    assert reloaded.get_supplier(2) is None
+
+
+def test_remove_supplier_bad_unknown_id(suppliers):
+    """Slecht: supplier 99 bestaat niet, de andere 3 blijven staan."""
+    suppliers.remove_supplier(99)
+
+    assert len(suppliers.get_suppliers()) == 3
