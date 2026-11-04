@@ -10,12 +10,14 @@ class Suppliers(Base):
         self.load(is_debug)
 
     def get_suppliers(self):
+        """Geef de lijst met alle suppliers."""
         return self.data
 
     def get_supplier(self, supplier_id):
-        for x in self.data:
-            if x["id"] == supplier_id:
-                return x
+        """Geef de supplier met dit id, of None als die niet bestaat."""
+        for supplier in self.data:
+            if supplier["id"] == supplier_id:
+                return supplier
         return None
 
     def add_supplier(self, supplier):
