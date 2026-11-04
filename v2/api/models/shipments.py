@@ -12,9 +12,21 @@ class Shipments(Base):
 
     def get_shipments(self):
         """Geef alle shipments, elk met zijn items."""
+        # shipment_item.json maar 1 keer lezen, niet 1 keer per shipment
+        items_per_shipment = {}
+        for row in data_provider.fetch_shipment_item_pool().data:
+            shipment_id = row["shipment_id"]
+            if shipment_id not in items_per_shipment:
+                items_per_shipment[shipment_id] = []
+            items_per_shipment[shipment_id].append(
+                {"item_id": row["item_id"], "amount": row["amount"]}
+            )
+
         result = []
         for shipment in self.data:
-            result.append(self._with_items(shipment))
+            shipment = dict(shipment)
+            shipment["items"] = items_per_shipment.get(shipment["id"], [])
+            result.append(shipment)
         return result
 
     def get_shipment(self, shipment_id):
