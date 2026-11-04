@@ -10,12 +10,14 @@ class Suppliers(Base):
         self.load(is_debug)
 
     def get_suppliers(self):
+        """Geef de lijst met alle suppliers."""
         return self.data
 
     def get_supplier(self, supplier_id):
-        for x in self.data:
-            if x["id"] == supplier_id:
-                return x
+        """Geef de supplier met dit id, of None als die niet bestaat."""
+        for supplier in self.data:
+            if supplier["id"] == supplier_id:
+                return supplier
         return None
 
     def add_supplier(self, supplier):
@@ -39,11 +41,9 @@ class Suppliers(Base):
         if is_debug:
             self.data = SUPPLIERS
         else:
-            f = open(self.data_path, "r")
-            self.data = json.load(f)
-            f.close()
+            with open(self.data_path, "r", encoding="utf-8") as f:
+                self.data = json.load(f)
 
     def save(self):
-        f = open(self.data_path, "w")
-        json.dump(self.data, f)
-        f.close()
+        with open(self.data_path, "w", encoding="utf-8") as f:
+            json.dump(self.data, f)
