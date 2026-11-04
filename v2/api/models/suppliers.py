@@ -41,11 +41,9 @@ class Suppliers(Base):
         if is_debug:
             self.data = SUPPLIERS
         else:
-            f = open(self.data_path, "r")
-            self.data = json.load(f)
-            f.close()
+            with open(self.data_path, "r", encoding="utf-8") as f:
+                self.data = json.load(f)
 
     def save(self):
-        f = open(self.data_path, "w")
-        json.dump(self.data, f)
-        f.close()
+        with open(self.data_path, "w", encoding="utf-8") as f:
+            json.dump(self.data, f)
