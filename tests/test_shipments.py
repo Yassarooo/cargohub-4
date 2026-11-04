@@ -160,3 +160,27 @@ def test_update_shipment_bad_unknown_id(shipments):
 
     assert shipments.get_shipment(99) is None
     assert len(shipments.get_shipments()) == 3
+
+
+# update_orders_in_shipment (PUT /shipments/{id}/orders)
+
+def test_update_orders_in_shipment_good(shipments):
+    """Goed: shipment 3 krijgt order 5."""
+    shipments.update_orders_in_shipment(3, [5])
+
+    assert shipments.get_order_ids_in_shipment(3) == [5]
+
+
+def test_update_orders_in_shipment_empty_list(shipments):
+    """Een lege lijst haalt de order weg bij shipment 1."""
+    shipments.update_orders_in_shipment(1, [])
+
+    assert shipments.get_order_ids_in_shipment(1) == []
+
+
+def test_update_orders_in_shipment_bad_unknown_id(shipments):
+    """Slecht: shipment 99 bestaat niet, er verandert niks."""
+    shipments.update_orders_in_shipment(99, [5])
+
+    assert shipments.get_order_ids_in_shipment(99) == []
+    assert shipments.get_order_ids_in_shipment(1) == [1]
