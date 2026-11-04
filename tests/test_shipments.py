@@ -184,3 +184,29 @@ def test_update_orders_in_shipment_bad_unknown_id(shipments):
 
     assert shipments.get_order_ids_in_shipment(99) == []
     assert shipments.get_order_ids_in_shipment(1) == [1]
+
+
+# remove_shipment (DELETE)
+
+def test_remove_shipment_good(shipments):
+    """Goed: na verwijderen is shipment 2 weg."""
+    shipments.remove_shipment(2)
+
+    assert shipments.get_shipment(2) is None
+    assert len(shipments.get_shipments()) == 2
+
+
+def test_remove_shipment_saved(shipments, tmp_path):
+    """Goed: na save is shipment 2 ook uit het bestand weg."""
+    shipments.remove_shipment(2)
+    shipments.save()
+
+    reloaded = Shipments(str(tmp_path) + os.sep)
+    assert reloaded.get_shipment(2) is None
+
+
+def test_remove_shipment_bad_unknown_id(shipments):
+    """Slecht: shipment 99 bestaat niet, de andere 3 blijven staan."""
+    shipments.remove_shipment(99)
+
+    assert len(shipments.get_shipments()) == 3
