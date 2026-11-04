@@ -75,3 +75,31 @@ def test_add_supplier_bad_not_saved_without_save(suppliers, tmp_path):
 
     reloaded = Suppliers(str(tmp_path) + os.sep)
     assert reloaded.get_supplier(4) is None
+
+
+# update_supplier (PUT)
+
+def test_update_supplier_good(suppliers):
+    """Goed: na wijzigen geeft get de nieuwe stad terug."""
+    suppliers.update_supplier(2, {"id": 2, "code": "SUP-0002", "name": "Unilever", "city": "Utrecht"})
+
+    result = suppliers.get_supplier(2)
+    assert result["city"] == "Utrecht"
+    assert result["updated_at"] != ""
+
+
+def test_update_supplier_saved(suppliers, tmp_path):
+    """Goed: na save staat de wijziging ook in het bestand."""
+    suppliers.update_supplier(2, {"id": 2, "code": "SUP-0002", "name": "Unilever", "city": "Utrecht"})
+    suppliers.save()
+
+    reloaded = Suppliers(str(tmp_path) + os.sep)
+    assert reloaded.get_supplier(2)["city"] == "Utrecht"
+
+
+def test_update_supplier_bad_unknown_id(suppliers):
+    """Slecht: supplier 99 bestaat niet, er verandert niks."""
+    suppliers.update_supplier(99, {"id": 99, "code": "SUP-0099", "name": "Onbekend"})
+
+    assert suppliers.get_supplier(99) is None
+    assert len(suppliers.get_suppliers()) == 3
