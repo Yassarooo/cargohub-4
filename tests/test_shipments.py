@@ -99,3 +99,32 @@ def test_get_order_ids_in_shipment_no_order(shipments):
 def test_get_order_ids_in_shipment_bad_unknown_id(shipments):
     """Slecht: shipment 99 bestaat niet, dus een lege lijst."""
     assert shipments.get_order_ids_in_shipment(99) == []
+
+
+# add_shipment (POST)
+
+def test_add_shipment_good(shipments):
+    """Goed: na toevoegen kan je shipment 4 opvragen."""
+    shipments.add_shipment({"id": 4, "reference": "SHP-000004", "order_id": 3})
+
+    result = shipments.get_shipment(4)
+    assert result["reference"] == "SHP-000004"
+    assert result["created_at"] != ""
+    assert len(shipments.get_shipments()) == 4
+
+
+def test_add_shipment_saved(shipments, tmp_path):
+    """Goed: na save staat de nieuwe shipment ook in het bestand."""
+    shipments.add_shipment({"id": 4, "reference": "SHP-000004", "order_id": 3})
+    shipments.save()
+
+    reloaded = Shipments(str(tmp_path) + os.sep)
+    assert reloaded.get_shipment(4)["reference"] == "SHP-000004"
+
+
+def test_add_shipment_bad_not_saved_without_save(shipments, tmp_path):
+    """Slecht: zonder save komt de shipment niet in het bestand."""
+    shipments.add_shipment({"id": 4, "reference": "SHP-000004", "order_id": 3})
+
+    reloaded = Shipments(str(tmp_path) + os.sep)
+    assert reloaded.get_shipment(4) is None
