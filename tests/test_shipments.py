@@ -68,3 +68,17 @@ def test_get_shipment_good(shipments):
 def test_get_shipment_bad_unknown_id(shipments):
     """Slecht: shipment 99 bestaat niet, dus None."""
     assert shipments.get_shipment(99) is None
+
+
+# get_items_in_shipment
+
+def test_get_items_in_shipment_good(shipments):
+    """Goed: shipment 1 heeft 2 items."""
+    result = shipments.get_items_in_shipment(1)
+
+    assert result == [{"item_id": 10, "amount": 5}, {"item_id": 11, "amount": 2}]
+
+
+def test_get_items_in_shipment_bad_unknown_id(shipments):
+    """Slecht: shipment 99 bestaat niet, dus een lege lijst."""
+    assert shipments.get_items_in_shipment(99) == []
