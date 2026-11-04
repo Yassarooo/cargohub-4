@@ -34,3 +34,15 @@ def test_get_suppliers_bad_empty_file(tmp_path):
     """Slecht: een leeg bestand geeft een lege lijst (geen fout)."""
     (tmp_path / "supplier.json").write_text("[]", encoding="utf-8")
     assert Suppliers(str(tmp_path) + os.sep).get_suppliers() == []
+
+
+# get_supplier
+
+def test_get_supplier_good(suppliers):
+    """Goed: supplier 2 bestaat en komt terug."""
+    assert suppliers.get_supplier(2) == TEST_SUPPLIERS[1]
+
+
+def test_get_supplier_bad_unknown_id(suppliers):
+    """Slecht: supplier 99 bestaat niet, dus None."""
+    assert suppliers.get_supplier(99) is None
