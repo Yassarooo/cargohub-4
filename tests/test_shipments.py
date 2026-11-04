@@ -1,0 +1,55 @@
+import json
+import os
+import sys
+
+import pytest
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "v2", "api"))
+
+# data_provider eerst importeren, anders krijg je een circular import (zoals in main.py)
+from providers import data_provider  # pylint: disable=wrong-import-position
+from models.shipments import Shipments  # pylint: disable=wrong-import-position
+
+# Kleine, vaste testdata: 3 shipments en hun items.
+TEST_SHIPMENTS = [
+    {"id": 1, "reference": "SHP-000001", "order_id": 1, "shipment_status": "Pending"},
+    {"id": 2, "reference": "SHP-000002", "order_id": 2, "shipment_status": "Transit"},
+    {"id": 3, "reference": "SHP-000003", "order_id": None, "shipment_status": "Delivered"},
+]
+
+TEST_SHIPMENT_ITEMS = [
+    {"id": 1, "shipment_id": 1, "item_id": 10, "amount": 5},
+    {"id": 2, "shipment_id": 1, "item_id": 11, "amount": 2},
+    {"id": 3, "shipment_id": 2, "item_id": 10, "amount": 7},
+]
+
+
+@pytest.fixture
+def shipments(tmp_path, monkeypatch):
+    """Maak een Shipments-model met de testdata in een tijdelijke map."""
+    (tmp_path / "shipment.json").write_text(json.dumps(TEST_SHIPMENTS), encoding="utf-8")
+    (tmp_path / "shipment_item.json").write_text(
+        json.dumps(TEST_SHIPMENT_ITEMS), encoding="utf-8"
+    )
+    # de items van een shipment komen via data_provider, die moet ook de tijdelijke map gebruiken
+    monkeypatch.setattr(data_provider, "ROOT_PATH", str(tmp_path) + os.sep)
+    return Shipments(str(tmp_path) + os.sep)
+
+
+# get_shipments
+
+def test_get_shipments_good(shipments):
+    """Goed: alle 3 shipments komen terug, met hun items erbij."""
+    result = shipments.get_shipments()
+
+    assert len(result) == 3
+    assert result[0]["reference"] == "SHP-000001"
+    assert result[0]["items"] == [{"item_id": 10, "amount": 5}, {"item_id": 11, "amount": 2}]
+    assert result[1]["items"] == [{"item_id": 10, "amount": 7}]
+
+
+def test_get_shipments_no_items(shipments):
+    """Shipment 3 heeft geen items, dus een lege lijst."""
+    result = shipments.get_shipments()
+
+    assert result[2]["items"] == []
