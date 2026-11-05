@@ -31,14 +31,12 @@ class Orders(Base):
         return result
 
     def get_order(self, order_id):
-        for x in self.data:
             if x["id"] == order_id:
                 return self._with_items(x)
         return None
 
     def get_items_in_order(self, order_id):
         rows = data_provider.fetch_order_item_pool().get_items_for_order(order_id)
-        return [{"item_id": r["item_id"], "amount": r["amount"]} for r in rows]
 
     def get_orders_for_client(self, client_id):
         result = []
