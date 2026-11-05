@@ -66,3 +66,21 @@ def test_get_order_empty(empty_orders):
 def test_get_order_without_items(orders):
     assert orders.get_order(3) == EXPECTED_ORDERS[2]
 
+
+def test_get_items_in_order_good(orders):
+    assert orders.get_items_in_order(1) == [
+        {"item_id": 10, "amount": 5},
+        {"item_id": 11, "amount": 2},
+    ]
+
+
+def test_get_items_in_order_bad_unknown_id(orders):
+    assert orders.get_items_in_order(999) == []
+
+
+def test_get_items_in_order_without_items(orders):
+    assert orders.get_items_in_order(3) == []
+
+
+def test_get_orders_for_client_good(orders):
+    assert orders.get_orders_for_client(20) == EXPECTED_ORDERS[:2]
