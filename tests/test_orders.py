@@ -41,3 +41,13 @@ def orders(tmp_path, monkeypatch):
 def empty_orders(orders, tmp_path):
     (tmp_path / "order.json").write_text("[]", encoding="utf-8")
     return Orders(str(tmp_path) + os.sep)
+
+
+def test_get_orders_good(orders):
+    assert orders.get_orders() == EXPECTED_ORDERS
+
+
+def test_get_orders_empty(empty_orders):
+    assert empty_orders.get_orders() == []
+
+
