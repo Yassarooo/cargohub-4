@@ -51,3 +51,18 @@ def test_get_orders_empty(empty_orders):
     assert empty_orders.get_orders() == []
 
 
+def test_get_order_good(orders):
+    assert orders.get_order(2) == EXPECTED_ORDERS[1]
+
+
+def test_get_order_bad_unknown_id(orders):
+    assert orders.get_order(999) is None
+
+
+def test_get_order_empty(empty_orders):
+    assert empty_orders.get_order(1) is None
+
+
+def test_get_order_without_items(orders):
+    assert orders.get_order(3) == EXPECTED_ORDERS[2]
+
