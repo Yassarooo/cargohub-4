@@ -16,6 +16,7 @@ class ApiRequestHandler(http.server.BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(json.dumps(data).encode("utf-8"))
 
+    def handle_get_orders(self, paths):
     def handle_get_items(self, paths):
         """Handel GET /items, /items/{id}, /items/{id}/inventory en .../inventory/totals af."""
         parts = len(paths)
