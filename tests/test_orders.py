@@ -84,3 +84,27 @@ def test_get_items_in_order_without_items(orders):
 
 def test_get_orders_for_client_good(orders):
     assert orders.get_orders_for_client(20) == EXPECTED_ORDERS[:2]
+
+
+def test_get_orders_for_client_ship_to(orders):
+    assert orders.get_orders_for_client(10) == EXPECTED_ORDERS[:2]
+
+
+def test_get_orders_for_client_bill_to_without_duplicates(orders):
+    assert orders.get_orders_for_client(30) == EXPECTED_ORDERS
+
+
+def test_get_orders_for_client_bad_unknown_id(orders):
+    assert orders.get_orders_for_client(999) == []
+
+
+def test_get_orders_for_client_empty(empty_orders):
+    assert empty_orders.get_orders_for_client(10) == []
+
+
+def test_get_orders_does_not_change_stored_data(orders):
+    orders.get_orders()
+    orders.get_order(1)
+    orders.get_orders_for_client(10)
+
+    assert orders.data == TEST_ORDERS
