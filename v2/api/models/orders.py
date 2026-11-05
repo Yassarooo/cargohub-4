@@ -31,7 +31,9 @@ class Orders(Base):
         return result
 
     def get_order(self, order_id):
-                return self._with_items(x)
+        for order in self.data:
+            if order["id"] == order_id:
+                return self._with_items(order)
         return None
 
     def get_items_in_order(self, order_id):
@@ -39,12 +41,12 @@ class Orders(Base):
         return [{"item_id": row["item_id"], "amount": row["amount"]} for row in rows]
 
     def get_orders_for_client(self, client_id):
-        for x in self.data:
-            if (x["client_id"] == client_id
-                    or x["ship_to_client_id"] == client_id
-                    or x["bill_to_client_id"] == client_id):
-                result.append(self._with_items(x))
-        return result
+        return [
+            self._with_items(order) for order in self.data
+            if (order["client_id"] == client_id
+                or order["ship_to_client_id"] == client_id
+                or order["bill_to_client_id"] == client_id)
+        ]
 
     def add_order(self, order):
         items = order.pop("items", [])
