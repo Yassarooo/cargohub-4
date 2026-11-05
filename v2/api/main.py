@@ -18,6 +18,18 @@ class ApiRequestHandler(http.server.BaseHTTPRequestHandler):
 
     def handle_get_orders(self, paths):
         parts = len(paths)
+        if parts == 1:
+            self.send_json(data_provider.fetch_order_pool().get_orders())
+        elif parts == 2:
+            order_id = int(paths[1])
+            self.send_json(data_provider.fetch_order_pool().get_order(order_id))
+        elif parts == 3 and paths[2] == "items":
+            order_id = int(paths[1])
+            self.send_json(data_provider.fetch_order_pool().get_items_in_order(order_id))
+        else:
+            self.send_response(404)
+            self.end_headers()
+
     def handle_get_items(self, paths):
         """Handel GET /items, /items/{id}, /items/{id}/inventory en .../inventory/totals af."""
         parts = len(paths)
@@ -291,10 +303,7 @@ class ApiRequestHandler(http.server.BaseHTTPRequestHandler):
                     if paths[2] == "orders":
                         client_id = int(paths[1])
                         orders = data_provider.fetch_order_pool().get_orders_for_client(client_id)
-                        self.send_response(200)
-                        self.send_header("Content-type", "application/json")
-                        self.end_headers()
-                        self.wfile.write(json.dumps(orders).encode("utf-8"))
+                        self.send_json(orders)
                     else:
                         self.send_response(404)
                         self.end_headers()
