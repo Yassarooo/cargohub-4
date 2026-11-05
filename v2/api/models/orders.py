@@ -11,9 +11,23 @@ class Orders(Base):
         self.load(is_debug)
 
     def get_orders(self):
+        if not self.data:
+            return []
+
+        items_per_order = {}
+        for row in data_provider.fetch_order_item_pool().data:
+            order_id = row["order_id"]
+            if order_id not in items_per_order:
+                items_per_order[order_id] = []
+            items_per_order[order_id].append(
+                {"item_id": row["item_id"], "amount": row["amount"]}
+            )
+
         result = []
-        for x in self.data:
-            result.append(self._with_items(x))
+        for order in self.data:
+            order = dict(order)
+            order["items"] = items_per_order.get(order["id"], [])
+            result.append(order)
         return result
 
     def get_order(self, order_id):
