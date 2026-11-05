@@ -10,12 +10,14 @@ class ItemLines(Base):
         self.load(is_debug)
 
     def get_item_lines(self):
+        """Geef de lijst met alle item lines."""
         return self.data
 
     def get_item_line(self, item_line_id):
-        for x in self.data:
-            if x["id"] == item_line_id:
-                return x
+        """Geef de item line met dit id, of None als die niet bestaat."""
+        for item_line in self.data:
+            if item_line["id"] == item_line_id:
+                return item_line
         return None
 
     def add_item_line(self, item_line):
@@ -39,11 +41,9 @@ class ItemLines(Base):
         if is_debug:
             self.data = ITEM_LINES
         else:
-            f = open(self.data_path, "r")
-            self.data = json.load(f)
-            f.close()
+            with open(self.data_path, "r", encoding="utf-8") as f:
+                self.data = json.load(f)
 
     def save(self):
-        f = open(self.data_path, "w")
-        json.dump(self.data, f)
-        f.close()
+        with open(self.data_path, "w", encoding="utf-8") as f:
+            json.dump(self.data, f)
