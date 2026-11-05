@@ -254,35 +254,7 @@ class ApiRequestHandler(http.server.BaseHTTPRequestHandler):
         elif paths[0] == "suppliers":
             self.handle_get_suppliers(paths)
         elif paths[0] == "orders":
-            parts = len(paths)
-            match parts:
-                case 1:
-                    orders = data_provider.fetch_order_pool().get_orders()
-                    self.send_response(200)
-                    self.send_header("Content-type", "application/json")
-                    self.end_headers()
-                    self.wfile.write(json.dumps(orders).encode("utf-8"))
-                case 2:
-                    order_id = int(paths[1])
-                    order = data_provider.fetch_order_pool().get_order(order_id)
-                    self.send_response(200)
-                    self.send_header("Content-type", "application/json")
-                    self.end_headers()
-                    self.wfile.write(json.dumps(order).encode("utf-8"))
-                case 3:
-                    if paths[2] == "items":
-                        order_id = int(paths[1])
-                        items = data_provider.fetch_order_pool().get_items_in_order(order_id)
-                        self.send_response(200)
-                        self.send_header("Content-type", "application/json")
-                        self.end_headers()
-                        self.wfile.write(json.dumps(items).encode("utf-8"))
-                    else:
-                        self.send_response(404)
-                        self.end_headers()
-                case _:
-                    self.send_response(404)
-                    self.end_headers()
+            self.handle_get_orders(paths)
         elif paths[0] == "clients":
             parts = len(paths)
             match parts:
