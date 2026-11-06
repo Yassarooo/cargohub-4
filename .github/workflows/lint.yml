@@ -1,0 +1,33 @@
+name: Pylint
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+  lint:
+    name: Pylint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Code ophalen
+        uses: actions/checkout@v4
+
+      - name: Python installeren
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Dependencies installeren
+        run: pip install -r v2/requirements-dev.txt
+
+      - name: Lint Action
+        uses: wearerequired/lint-action@v3.0.2
+        with:
+          pylint: true
+          auto_fix: false
