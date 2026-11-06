@@ -24,7 +24,7 @@ jobs:
           python-version: "3.12"
 
       - name: Dependencies installeren
-        run: pip install -r requirements.txt
+        run: pip install -r v2/requirements-dev.txt
 
       - name: Lint Action
         uses: wearerequired/lint-action@v3.0.2
