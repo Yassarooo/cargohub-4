@@ -11,29 +11,42 @@ class Orders(Base):
         self.load(is_debug)
 
     def get_orders(self):
+        if not self.data:
+            return []
+
+        items_per_order = {}
+        for row in data_provider.fetch_order_item_pool().data:
+            order_id = row["order_id"]
+            if order_id not in items_per_order:
+                items_per_order[order_id] = []
+            items_per_order[order_id].append(
+                {"item_id": row["item_id"], "amount": row["amount"]}
+            )
+
         result = []
-        for x in self.data:
-            result.append(self._with_items(x))
+        for order in self.data:
+            order = dict(order)
+            order["items"] = items_per_order.get(order["id"], [])
+            result.append(order)
         return result
 
     def get_order(self, order_id):
-        for x in self.data:
-            if x["id"] == order_id:
-                return self._with_items(x)
+        for order in self.data:
+            if order["id"] == order_id:
+                return self._with_items(order)
         return None
 
     def get_items_in_order(self, order_id):
         rows = data_provider.fetch_order_item_pool().get_items_for_order(order_id)
-        return [{"item_id": r["item_id"], "amount": r["amount"]} for r in rows]
+        return [{"item_id": row["item_id"], "amount": row["amount"]} for row in rows]
 
     def get_orders_for_client(self, client_id):
-        result = []
-        for x in self.data:
-            if (x["client_id"] == client_id
-                    or x["ship_to_client_id"] == client_id
-                    or x["bill_to_client_id"] == client_id):
-                result.append(self._with_items(x))
-        return result
+        return [
+            self._with_items(order) for order in self.data
+            if (order["client_id"] == client_id
+                or order["ship_to_client_id"] == client_id
+                or order["bill_to_client_id"] == client_id)
+        ]
 
     def add_order(self, order):
         items = order.pop("items", [])
